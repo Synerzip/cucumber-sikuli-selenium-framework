@@ -1,0 +1,18 @@
+[{
+    "name": "Open Google Search in Browser",
+    "type": "OpenUrlAction",
+
+    "url": "http://www.google.com",
+    "errorMessage": "Could not open Google in Browser",
+    "waitPeriodInMillis": 20000
+
+
+},{
+    "name": "Get Browser in Foreground",
+    "type": "BrowserForegroundAction",
+    
+    "errorMessage": "Could not open Google in Browser"
+
+}
+]
+

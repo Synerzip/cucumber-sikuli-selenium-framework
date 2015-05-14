@@ -1,0 +1,11 @@
+[{
+    "name": "Verify if we see Facebook link",
+    "type": "VerifyWebElementAction",
+
+    "selector": "linkText:{{message}}",   
+    "errorMessage": "Could not search for keyword in Google Search",
+    "waitPeriodInMillis": 10000
+
+}]
+
+

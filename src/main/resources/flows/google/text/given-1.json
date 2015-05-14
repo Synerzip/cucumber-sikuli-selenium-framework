@@ -1,0 +1,11 @@
+[{
+    "name": "Open Google Search in Browser",
+    "type": "OpenUrlAction",
+
+    "url": "http://www.google.com",
+    "errorMessage": "Could not open Google in Browser",
+    "waitPeriodInMillis": 20000
+
+
+}]
+

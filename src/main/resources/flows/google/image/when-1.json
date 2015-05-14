@@ -1,0 +1,32 @@
+[{
+    "name": "Type in Google Search Text Box",
+    "type": "TypeInWebElementAction",
+
+    "selector": "id:lst-ib",
+    "text": "{{text}}",
+    "errorMessage": "Could not search for keyword in Google Search",
+    "waitPeriodInMillis": 10000
+
+},
+{
+    "name": "Click on Search Button",
+    "type": "ClickWebElementAction",
+
+    "selector": "name:btnG",
+    "text": "{{text}}",
+    "errorMessage": "Could not find Search Button",
+    "waitPeriodInMillis": 10000
+
+},
+{
+    "name": "Click on Image search Button",
+    "type": "ClickWebElementAction",
+
+    "selector": "linkText:Images",
+    "text": "{{text}}",
+    "errorMessage": "Could not Image Search Button",
+    "waitPeriodInMillis": 10000
+
+}]
+
+

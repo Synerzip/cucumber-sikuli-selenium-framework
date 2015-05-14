@@ -1,0 +1,11 @@
+[{
+    "name": "Verify if we see Facebook image",
+    "type": "VerifyImageAction",
+
+    "image": "facebook.png",   
+    "errorMessage": "Could not find facebook image in Image Search Result",
+    "waitPeriodInMillis": 10000
+
+}]
+
+
