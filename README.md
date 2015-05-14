@@ -32,7 +32,7 @@ The way this framework works is Feature file are run by cucumber which calls the
 Feature File ==> Step Definitions ==> Flow.json ==> Actions
 
 Step.json
-
+```
 [{
     "name": "Type in Google Search Text Box",
     "type": "TypeInWebElementAction",
@@ -53,3 +53,4 @@ Step.json
     "waitPeriodInMillis": 10000
 
 }]
+```
