@@ -29,7 +29,10 @@ The Text Search uses Selenium and the Image Search uses Sikuli.
 
 The way this framework works is Feature file are run by cucumber which calls the Step Definition classes, which in turn call FlowRunner.java class, which in turn runs step.json file. In step.json file we have Actions (Selenium and Sikuli actions for verifying element/image is present, clicking them, typing in them). See BaseAction and its derived classes.
 
+Flow Diagram 
+```
 Feature File ==> Step Definitions ==> Flow.json ==> Actions
+```
 
 Feature File
 ```
@@ -50,28 +53,13 @@ Scenario: Doing Google Text Search
 
 Step Definition File
 ```
-package com.synerzip.testframework.steps;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.synerzip.testframework.context.Context;
-import com.synerzip.testframework.flow.FlowRunner;
-
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
 
 public class GoogleImageSearchStepDefinitions {
-
-	
 	@Autowired
 	private Context context;
-
+	
 	@Autowired
 	private FlowRunner flowRunner;
-	
 	
 	@When("^I search for \"(.*?)\" image$")
 	public void i_search_for_image(String searchKeyword) throws Throwable {
@@ -86,8 +74,6 @@ public class GoogleImageSearchStepDefinitions {
 		context.setFeature("google/image");
 	    flowRunner.run(context, "then-1.json");
 	}
-
-	
 
 }
 
@@ -119,33 +105,9 @@ Step.json
 
 Base Action class
 ```
-/**
- * 
- */
-package com.synerzip.testframework.action;
 
-import java.util.Map;
-
-import com.synerzip.testframework.content.ContentManager;
-import com.synerzip.testframework.context.Context;
-import com.synerzip.testframework.driver.TestDriver;
-import com.synerzip.testframework.exceptions.ActionFailedException;
-
-// TODO: Auto-generated Javadoc
-/**
- * The Class BaseAction.
- *
- * @author rohitghatol
- */
 public abstract class BaseAction {
 
-	// The testDriver, contentMgr and context is injected by ActionDeserializer
-	// class and does not
-	// happen using Spring Dependency Injection. Reason being these classes are
-	// create by ActionDeserializer
-	// reading from flow.json and not by Spring, hence @Autowire does not work
-	// here.
-	// For more details visit ActionDeserailizer class
 	/** The test driver. */
 	protected TestDriver testDriver;
 
@@ -279,30 +241,7 @@ public abstract class BaseAction {
 
 TypeInImageAction (sikuli)
 ```
-/**
- * 
- */
-package com.synerzip.testframework.action;
 
-import static org.junit.Assert.assertNotNull;
-import static org.sikuli.api.API.pause;
-
-import java.util.Map;
-
-import org.sikuli.api.ScreenRegion;
-import org.sikuli.api.Target;
-import org.sikuli.api.robot.Key;
-import org.sikuli.api.robot.Keyboard;
-import org.sikuli.api.robot.Mouse;
-
-import com.synerzip.testframework.exceptions.ActionFailedException;
-
-// TODO: Auto-generated Javadoc
-/**
- * The Class TypeInImageAction.
- *
- * @author rohitghatol
- */
 public class TypeInImageAction extends BaseAction {
 
 	/** The image. */
@@ -441,30 +380,7 @@ public class TypeInImageAction extends BaseAction {
 
 TypeInWebElement (selenium)
 ```
-/**
- * 
- */
-package com.synerzip.testframework.action;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.util.Map;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.synerzip.testframework.exceptions.ActionFailedException;
-import com.synerzip.testframework.webelement.WebSelector;
-
-// TODO: Auto-generated Javadoc
-/**
- * The Class ClickImageAction.
- *
- * @author rohitghatol
- */
 public class TypeInWebElementAction extends BaseAction {
 
 	/** The image. */
@@ -594,6 +510,80 @@ public class TypeInWebElementAction extends BaseAction {
 	}
 	
 	
+
+}
+
+```
+
+
+Json Deserilization Class which converts the Step.json into List<BaseAction>
+
+```
+@Component
+public class ActionDeserializer implements JsonDeserializer<List<BaseAction>> {
+
+	/** The map. */
+	private static Map<String, Class> map = new TreeMap<String, Class>();
+
+	
+	static {
+
+		map.put("ClickImageAction", ClickImageAction.class);
+		map.put("TypeInImageAction", TypeInImageAction.class);
+		map.put("VerifyImageAction", VerifyImageAction.class);
+		map.put("OpenUrlAction", OpenUrlAction.class);
+		map.put("BrowserForegroundAction", BrowserForegroundAction.class);
+		map.put("ClickWebElementAction", ClickWebElementAction.class);
+		map.put("TypeInWebElementAction", TypeInWebElementAction.class);
+		map.put("VerifyWebElementAction", VerifyWebElementAction.class);
+		
+	}
+
+	/** The test driver. */
+	@Autowired
+	protected TestDriver testDriver;
+	
+	/** The content mgr. */
+	@Autowired
+	protected ContentManager contentMgr;
+	
+	/** The context. */
+	@Autowired
+	protected Context context;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.google.gson.JsonDeserializer#deserialize(com.google.gson.JsonElement,
+	 * java.lang.reflect.Type, com.google.gson.JsonDeserializationContext)
+	 */
+	public List<BaseAction> deserialize(JsonElement json, Type typeOfT,
+			JsonDeserializationContext jsonContext) throws JsonParseException {
+
+		List<BaseAction> list = new ArrayList<BaseAction>();
+		JsonArray ja = json.getAsJsonArray();
+
+		for (JsonElement je : ja) {
+
+			String type = je.getAsJsonObject().get("type").getAsString();
+			Class<BaseAction> c = map.get(type);
+			if (c == null)
+				throw new RuntimeException("Unknow class: " + type);
+			BaseAction action = ((BaseAction)jsonContext.deserialize(je, c));
+			
+			//Manually Inject the contentManager, context and testDriver
+			action.setContentMgr(this.contentMgr);
+			action.setContext(this.context);
+			action.setTestDriver(this.testDriver);
+			
+
+			
+			list.add(action);
+		}
+
+		return list;
+
+	}
 
 }
 
